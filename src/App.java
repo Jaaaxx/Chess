@@ -6,10 +6,6 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.Buffer;
-import java.util.Arrays;
-
-import static java.awt.Font.PLAIN;
 
 
 public class App extends JPanel {
