@@ -10,7 +10,6 @@ import java.io.IOException;
 
 public class App extends JPanel {
     Display display;
-    MouseController mouseController;
     static BufferedImage[] images = new BufferedImage[14];
 
     Color wBrown = new Color(146,99,74);
@@ -42,6 +41,38 @@ public class App extends JPanel {
     int enPassant = 0;
     boolean movedKingW = false;
     boolean movedKingB = false;
+
+    public boolean isDanger(int row1, int col1, int row2, int col2) {
+        if (Math.abs(board[row2][col2]) == 1) {
+            if (Math.abs(row2 - row1) == Math.abs(col2 - col1)) {
+                for (int i = 1; i < Math.abs(row2 - row1); i++) {
+                    if (Math.abs(row1 - row2 < 0 ? (col1 - col2 < 0 ? board[row1+i][col1-i] : board[row1+i][col1+i]) : (col1 - col2 < 0 ? board[row1-i][col1-i] : board[row1-i][col1+i])) != 0) {
+                        return false;
+                    }
+                }
+                return true;
+            } else if (row2 == row1 || col2 == col1) {
+                if (row2 == row1) {
+                    for (int i = Math.min(row1, row2) + 1; i < Math.max(row1, row2); i++) {
+                        if (board[i][col1] != 0)
+                            return false;
+                    }
+                } else {
+                    for (int i = Math.min(col1, col2) + 1; i < Math.max(col1, col2); i++) {
+                        if (board[row1][i] != 0)
+                            return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        if (Math.abs(board[row2][col2]) == 2) {
+            if (whiteTurn ? (row1 - row2 == 1) : (row2 - row1 == 1) && Math.abs(col2 - col1) == 1)
+                return true;
+        }
+        return false;
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -255,15 +286,14 @@ public class App extends JPanel {
                 }
             }
         } else {
-            if (whiteTurn) {
-                if (board[row][col] > 0) {
-                    selRow = row;
-                    selCol = col;
-                }
-            } else {
-                if (board[row][col] < 0) {
-                    selRow = row;
-                    selCol = col;
+            if (whiteTurn ? board[row][col] > 0 : board[row][col] < 0) {
+                selRow = row;
+                selCol = col;
+                for (int i = 0; i < board.length; i++) {
+                    for (int j = 0; j < board[i].length; j++) {
+                        if (isDanger(row, col, i, j))
+                            System.out.println("Danger from " + stringPieces[Math.abs(board[i][j])].toUpperCase() + " at: " + i + " " + j);
+                    }
                 }
             }
         }
